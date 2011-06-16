@@ -1,0 +1,3 @@
+ICFP Contest 2011
+=================
+I might add more to the wiki...
