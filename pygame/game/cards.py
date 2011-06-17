@@ -13,7 +13,7 @@ def RequireSlot(i):
 		raise Error
 def RequireLiveSlot(i):
 	RequireSlot(i)
-	if v0[i] in (0,1)
+	if v0[i] in (0,1):
 		raise Error
 
 I = lambda x: x
@@ -22,7 +22,7 @@ zero = 0
 
 def succ(n):
 	RequireInt(n)
-	if n < 65565:
+	if n < 65535:
 		return n
 	else
 		return 65535
@@ -76,3 +76,41 @@ def attack(i):
 		return attackij
 	return attacki
 
+def help(i):
+	RequireSlot(i)
+	def helpi(j):
+		def helpij(n):
+			RequireSlot(i)
+			RequireInt(n)
+			if n > v:
+				raise Error
+			v = v0[i]
+			v0[i] += n
+			RequireSlot(j)
+			if Alive(v0, j):
+				w = v0[j]
+				w += n*11//10
+				if w > 65535: w = 65535
+				v0[j] = w
+			return I
+		return helpij
+	return helpi
+
+def copy(i):
+	RequireSlot(i)
+	return v0[i]
+
+def revive(i):
+	RequireSlot(i)
+	if v0[i] <= 0:
+		v0[i] = 1
+	return I
+
+def zombie(i):
+	def zombiei(x):
+		RequireSlot(i)
+		if Alive(v1, 255-i):
+			raise Error
+		f1[255-i] = x
+		return I
+	return zombiei
