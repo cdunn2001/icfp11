@@ -10,6 +10,8 @@ TARFILE := cd-lb-kg.tar.gz
 # path to root, relative to the temporary tarball root
 RELTOPDIR := ../
 
+IMPORTANT_SRCS := $(shell cd $(RELTOPDIR) && git ls-files | egrep '(engines|pygame)')
+
 $(TARFILE):
 	@# everything must be in this directory prior to creating
 	@# a tarball so that relative .tar.gz paths are correct;
@@ -19,7 +21,7 @@ $(TARFILE):
 	mkdir $(TARDIR)/src
 	@echo
 	@echo "-> copying source files to temporary space..."
-	cp -a $(RELTOPDIR)/{engines,pygame} $(TARDIR)/src/
+	$(foreach RELPATH,$(IMPORTANT_SRCS),tar cf - -C $(RELTOPDIR) $(RELPATH) | tar xpf - -C $(TARDIR)/src/ ; )
 	mkdir $(TARDIR)/src/submit/
 	cp $(RELTOPDIR)/submit/Makefile $(TARDIR)/src/submit/
 	#cp $(RELTOPDIR)/install $(TARDIR) # FIXME: update this when actual executable is done
@@ -42,3 +44,7 @@ $(TARFILE):
 .PHONY: clean
 clean:
 	-rm -Rf $(TARDIR) $(TARFILE)
+
+.PHONY: info
+info:
+	@echo "IMPORTANT_SRCS := $(IMPORTANT_SRCS)"
