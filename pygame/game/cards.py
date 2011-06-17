@@ -62,9 +62,9 @@ def attack(i):
 		def attackij(n):
 			RequireSlot(i)
 			RequireInt(n)
+			v = v0[i]
 			if n > v:
 				raise Error
-			v = v0[i]
 			v0[i] -= n
 			RequireSlot(j)
 			if Alive(v1, 255-j):
@@ -77,15 +77,14 @@ def attack(i):
 	return attacki
 
 def help(i):
-	RequireSlot(i)
 	def helpi(j):
 		def helpij(n):
 			RequireSlot(i)
 			RequireInt(n)
+			v = v0[i]
 			if n > v:
 				raise Error
-			v = v0[i]
-			v0[i] += n
+			v0[i] -= n
 			RequireSlot(j)
 			if Alive(v0, j):
 				w = v0[j]
@@ -98,7 +97,7 @@ def help(i):
 
 def copy(i):
 	RequireSlot(i)
-	return v0[i]
+	return v1[i]
 
 def revive(i):
 	RequireSlot(i)
@@ -112,5 +111,6 @@ def zombie(i):
 		if Alive(v1, 255-i):
 			raise Error
 		f1[255-i] = x
+		v1[255-1] = -1
 		return I
 	return zombiei
