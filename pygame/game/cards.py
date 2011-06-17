@@ -1,3 +1,5 @@
+# -*- Mode: python; indent-tabs-mode: t; -*-
+# vim: set noexpandtab:
 v0 = [0]*256
 v1 = [0]*256
 f0 = [0]*256
