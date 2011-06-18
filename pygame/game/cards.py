@@ -25,7 +25,7 @@ def succ(n):
 	RequireInt(n)
 	if n < 65535:
 		return n
-	else
+	else:
 		return 65535
 
 def dbl(n):
@@ -63,7 +63,7 @@ def pdec(pro):
 		return I
 	return dec
 
-def pattach(pro):
+def pattack(pro):
 	opp = 1-pro
 	def attack(i):
 		RequireSlot(i)
