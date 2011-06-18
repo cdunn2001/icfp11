@@ -22,7 +22,7 @@ def main():
         opp()
     while True:
         move(2, 0, "zero")
-        for i in range(256):
+        for i in range(1):
             move(2, 1, "zero")
             move(1, "get", 1)
             move(1, "dec", 1)

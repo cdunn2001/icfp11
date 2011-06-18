@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- Mode: python; indent-tabs-mode: t; -*-
+# vim: set noexpandtab:
 import sys
 import os.path
 import random

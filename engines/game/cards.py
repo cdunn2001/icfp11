@@ -60,14 +60,15 @@ def pinc(pro):
 
 def pdec(pro):
 	def dec(s, i):
+		opp = 1-pro
 		RequireSlot(i)
-		v = s.v[pro][i]
+		v = s.v[opp][255-i]
 		if s.is_auto_app:
 			if v < 65535 and v > 0:
-				s.v[pro][i] += 1
+				s.v[opp][255-i] += 1
 		else:
 			if v > 0:
-				s.v[pro][i] -= 1
+				s.v[opp][255-i] -= 1
 		return I
 	return dec
 
@@ -154,6 +155,7 @@ def pzombie(pro):
 	return zombie
 
 
+
 def get_cards(pro):
 	cards = dict()
 	cards["I"] = I
@@ -174,4 +176,9 @@ def get_cards(pro):
 	return cards
 
 a_cards = [get_cards(0), get_cards(1)]
+
+card_names = dict()
+for i in range(2):
+	for name, func in a_cards[i].items():
+		card_names[func] = name
 

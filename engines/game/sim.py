@@ -119,16 +119,19 @@ class Simulator(object):
 		the card cannot be invoked.
 		"""
 		ai = self.player # actor index
-		if (self.v[ai][slot] == -1):
-			raise Error("slot for apply_left() is dead")
-		elif slot not in Simulator.slot_range:
-			raise Error("slot for apply_left() is out of range")
-		elif not hasattr(card, '__call__'):
-			raise Error("card for apply_left() is not a function")
-		if self.log_stream is not None:
-			print >>self.log_stream, "apply_left", card, slot
-		self.applying_slot()
-		self.f[ai][slot] = card(self, self.f[ai][slot]) # may raise and abort assignment (OK, in spec)
+		try:
+			if (self.v[ai][slot] == -1):
+				raise Error("slot for apply_left() is dead")
+			elif slot not in Simulator.slot_range:
+				raise Error("slot for apply_left() is out of range")
+			elif not hasattr(card, '__call__'):
+				raise Error("card for apply_left() is not a function")
+			if self.log_stream is not None:
+				print >>self.log_stream, "apply_left", card, slot
+			self.applying_slot()
+			self.f[ai][slot] = card(self, self.f[ai][slot]) # may raise and abort assignment (OK, in spec)
+		except (Error, TypeError) as e:
+			self.f[ai][slot] = cards.I
 
 	def apply_right(self, card, slot):
 		"""Invoke the specified function (slot field), passing in the
@@ -136,16 +139,19 @@ class Simulator(object):
 		or the slot's field cannot be invoked.
 		"""
 		ai = self.player # actor index
-		if (self.v[ai][slot] == -1):
-			raise Error("slot for apply_right() is dead")
-		elif slot not in Simulator.slot_range:
-			raise Error("slot for apply_right() is out of range")
-		elif not hasattr(self.f[ai][slot], '__call__'):
-			pass #raise Error("slot for apply_right() is not a function")
-		if self.log_stream is not None:
-			print >>self.log_stream, "apply_right", card, slot
-		self.applying_slot()
-		self.f[ai][slot] = self.f[ai][slot](self, card) # may raise and abort assignment (OK, in spec)
+		try:
+			if (self.v[ai][slot] == -1):
+				raise Error("slot for apply_right() is dead")
+			elif slot not in Simulator.slot_range:
+				raise Error("slot for apply_right() is out of range")
+			elif not hasattr(self.f[ai][slot], '__call__'):
+				pass #raise Error("slot for apply_right() is not a function")
+			if self.log_stream is not None:
+				print >>self.log_stream, "apply_right", card, slot
+			self.applying_slot()
+			self.f[ai][slot] = self.f[ai][slot](self, card) # may raise and abort assignment (OK, in spec)
+		except (Error, TypeError) as e:
+			self.f[ai][slot] = cards.I
 
 	def next_ply(self):
 		"""Implicitly changes the current player and current opponent,
@@ -166,6 +172,11 @@ class Simulator(object):
 		If lr==1: func is a card-name, arg is a slot-num.
 		If lr==2: func is a slot-num, arg is a card-name.
 		"""
+		p = self.player; o = 1-p
+		#prevp = self.v[p][:]
+		#fp = self.f[p][:]
+		#prevo = self.v[o][:]
+		#op = self.f[o][:]
 		try:
 			if lr == 1:
 				card = a_cards[self.player][func]
@@ -175,10 +186,23 @@ class Simulator(object):
 				card = a_cards[self.player][arg]
 				slot = int(func)
 				self.apply_right(card, slot)
-		except (Error, TypeError) as e:
-			pass
+		except:
+			# We moved the exception-handler into apply_left/right.
+			raise
+		#print p, ":", diff(prevp, self.v[p]), diff(fp, self.f[p])
+		#print o, ":", diff(prevo, self.v[o]), diff(op, self.f[o])
 		self.next_ply()
-
+def fov(v):
+	if v in cards.card_names:
+		return cards.card_names[v]
+	return v
+def diff(aold, anew):
+	for i in range(len(anew)):
+		if aold[i] != anew[i]:
+			ao = fov(aold[i])
+			an = fov(anew[i])
+			return "%i:%r=>%r" %(i, ao, an)
+	return "="
 
 if __name__ == "__main__":
 	# basic test...see what's defined
