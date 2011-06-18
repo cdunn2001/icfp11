@@ -17,18 +17,18 @@ def RequireLiveSlot(v, i):
 	if v[i] in (0,1):
 		raise Error
 
-I = lambda x: x
+I = lambda _, x: x
 
 zero = 0
 
-def succ(n):
+def succ(_, n):
 	RequireInt(n)
 	if n < 65535:
 		return n
 	else
 		return 65535
 
-def dbl(n):
+def dbl(_, n):
 	RequireInt(n)
 	if n>=32768:
 		return 65535
@@ -36,17 +36,17 @@ def dbl(n):
 		return n*2
 
 def pget(pro):
-	def get(i):
+	def get(s, i):
 		RequireLiveSlot(s.v[pro], i)
 		return s.f[pro][i]
 	return get
 
-put = lambda x: I
-S = lambda f: lambda g: lambda x: f(x)(g(x))
-K = lambda x: lambda y: x
+put = lambda _, x: I
+S = lambda _, f: lambda __, g: lambda s, x: f(s, x)(g(s, x))
+K = lambda _, x: lambda __, y: x
 
 def pinc(pro):
-	def inc(i):
+	def inc(s, i):
 		RequireSlot(i)
 		v = s.v[pro][i]
 		if v < 65535 and v > 0:
@@ -55,7 +55,7 @@ def pinc(pro):
 	return inc
 
 def pdec(pro):
-	def dec(i):
+	def dec(s, i):
 		RequireSlot(i)
 		v = s.v[pro][i]
 		if v > 0:
@@ -65,10 +65,10 @@ def pdec(pro):
 
 def pattach(pro):
 	opp = 1-pro
-	def attack(i):
+	def attack(_, i):
 		RequireSlot(i)
-		def attacki(j):
-			def attackij(n):
+		def attacki(__, j):
+			def attackij(s, n):
 				RequireSlot(i)
 				RequireInt(n)
 				v = s.v[pro][i]
@@ -87,9 +87,9 @@ def pattach(pro):
 
 def phelp(pro):
 	opp = 1-pro
-	def help(i):
-		def helpi(j):
-			def helpij(n):
+	def help(_, i):
+		def helpi(__, j):
+			def helpij(s, n):
 				RequireSlot(i)
 				RequireInt(n)
 				v = s.v[pro][i]
@@ -109,13 +109,13 @@ def phelp(pro):
 
 def pcopy(pro):
 	opp = 1-pro
-	def copy(i):
+	def copy(s, i):
 		RequireSlot(i)
 		return s.v[opp][i]
 	return copy
 
 def previve(pro):
-	def revive(i):
+	def revive(s, i):
 		RequireSlot(i)
 		if s.v[pro][i] <= 0:
 			s.v[pro][i] = 1
@@ -124,7 +124,7 @@ def previve(pro):
 
 def pzombie(pro):
 	opp = 1-pro
-	def zombie(i):
+	def zombie(s, i):
 		def zombiei(x):
 			RequireSlot(i)
 			if Alive(s.v[opp], 255-i):
