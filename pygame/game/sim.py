@@ -62,7 +62,7 @@ class Simulator:
 		self.opponent = 1
 		self.is_auto_app = False
 		self.turn_count = 0
-		self.auto_appl_count = 0
+		self.appl_count = 0
 		self.v = [[10000] * 256, [10000] * 256] # 10000 is spec init. value
 		self.f = [[cards.I] * 256, [cards.I] * 256] # Identity is spec init. value
 
@@ -70,12 +70,13 @@ class Simulator:
 		"""Change the behavior of certain cards, iterate over
 		every dead slot of the current player, make field changes
 		and then return card behavior to normal.  While changes
-		are being applied, the is_auto_app field is True.
+		are being applied, the is_auto_app field is True; at any
+		other time, it is False.
 		"""
 		self.is_auto_app = True
 		ai = self.player # actor index
 		for slot in Simulator.slot_range:
-			self.auto_appl_count = 0
+			self.appl_count = 0
 			try:
 				slot_field = self.f[ai][slot]
 				if not hasattr(slot_field, '__call__'):
@@ -93,14 +94,16 @@ class Simulator:
 		self.is_auto_app = False
 
 	def applying_slot():
-		"""Raise if called more than 1000 times since the last reset.
-		This must only be called by card implementations, and only
-		when the "is_auto_app" field is True.
+		"""Raise if called more than 1000 times since the last reset
+		of the appl_count field.
+		
+		This must be called ANY time a function from a card is applied
+		ANYWHERE.  If is_auto_app mode is True, the count will reset
+		for every slot; otherwise, it is reset by next_turn().
 		"""
-		if self.is_auto_app:
-			self.auto_appl_count = self.auto_appl_count + 1
-			if (self.auto_appl_count > 1000): # as in spec
-				raise _TooManyFuncs()
+		self.appl_count = self.appl_count + 1
+		if (self.appl_count > 1000): # as in spec (either regular turns or auto-apps)
+			raise _TooManyFuncs()
 
 	def next_turn():
 		"""Implicitly changes the current player and current opponent,
@@ -112,6 +115,7 @@ class Simulator:
 		self.opponent = 1 - self.opponent
 		self.turn_count = self.turn_count + 1
 		self._auto_app()
+		self.appl_count = 0
 
 if __name__ == "__main__":
 	# basic test...see what's defined
