@@ -4,7 +4,9 @@
 simulator; provides access to game data and tracks movements
 """
 
+from error import Error
 import cards
+import sys
 
 class _TooManyFuncs(Exception):
 	# flags the "more than 1000 functions" case of auto-app
@@ -53,20 +55,24 @@ class Simulator:
 
 	slot_range = range(256)
 
-	def __init__(self):
+	def __init__(self, player=None, log_stream=None):
 		"""Every card named in the spec should be defined,
 		associating the case-sensitive name from the spec with
 		a value or function as appropriate.
 		"""
-		self.player = 0
+		if player is None:
+			self.player = 0
+		else:
+			self.player = player
 		self.opponent = 1
 		self.is_auto_app = False
 		self.turn_count = 0
 		self.appl_count = 0
 		self.v = [[10000] * 256, [10000] * 256] # 10000 is spec init. value
 		self.f = [[cards.I] * 256, [cards.I] * 256] # Identity is spec init. value
+		self.log_stream = log_stream
 
-	def _auto_app():
+	def _auto_app(self):
 		"""Change the behavior of certain cards, iterate over
 		every dead slot of the current player, make field changes
 		and then return card behavior to normal.  While changes
@@ -93,7 +99,7 @@ class Simulator:
 				next
 		self.is_auto_app = False
 
-	def applying_slot():
+	def applying_slot(self):
 		"""Raise if called more than 1000 times since the last reset
 		of the appl_count field.
 		
@@ -105,7 +111,41 @@ class Simulator:
 		if (self.appl_count > 1000): # as in spec (either regular turns or auto-apps)
 			raise _TooManyFuncs()
 
-	def next_turn():
+	def apply_left(self, card, slot):
+		"""Invoke the specified function (card), passing in the slot's
+		field as an argument.  Raise an error if the slot is dead or
+		the card cannot be invoked.
+		"""
+		ai = self.player # actor index
+		if (self.v[ai][slot] == -1):
+			raise Error("slot for apply_left() is dead")
+		elif slot not in Simulator.slot_range:
+			raise Error("slot for apply_left() is out of range")
+		elif not hasattr(card, '__call__'):
+			raise Error("card for apply_left() is not a function")
+		if self.log_stream is not None:
+			print >>self.log_stream, "apply_left", card, slot
+		self.applying_slot()
+		self.f[ai][slot] = card(self, self.f[ai][slot]) # may raise and abort assignment (OK, in spec)
+
+	def apply_right(self, card, slot):
+		"""Invoke the specified function (slot field), passing in the
+		given card as an argument.  Raise an error if the slot is dead
+		or the slot's field cannot be invoked.
+		"""
+		ai = self.player # actor index
+		if (self.v[ai][slot] == -1):
+			raise Error("slot for apply_right() is dead")
+		elif slot not in Simulator.slot_range:
+			raise Error("slot for apply_right() is out of range")
+		elif not hasattr(self.f[ai][slot], '__call__'):
+			raise Error("slot for apply_right() is not a function")
+		if self.log_stream is not None:
+			print >>self.log_stream, "apply_right", card, slot
+		self.applying_slot()
+		self.f[ai][slot] = self.f[ai][slot](self, card) # may raise and abort assignment (OK, in spec)
+
+	def next_turn(self):
 		"""Implicitly changes the current player and current opponent,
 		and applies auto-application to all of the new player's data.
 		After this returns, you may start instructing the simulator on
@@ -116,6 +156,8 @@ class Simulator:
 		self.turn_count = self.turn_count + 1
 		self._auto_app()
 		self.appl_count = 0
+		if self.log_stream is not None:
+			print >>self.log_stream, "new turn:", self.turn_count
 
 if __name__ == "__main__":
 	# basic test...see what's defined

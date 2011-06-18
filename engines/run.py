@@ -1,81 +1,39 @@
 #!/usr/bin/env python
 import sys
+import os.path
+import random
 
-valid_cards = {
-  "I": {},
-  "zero": {},
-  "succ": {},
-  "dbl": {},
-  "get": {},
-  "put": {},
-  "S": {},
-  "K": {},
-  "inc": {},
-  "dec": {},
-  "attack": {},
-  "help": {},
-  "copy": {},
-  "revive": {},
-  "zombie": {},
-}
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+import pygame.game.cards as cards
+import pygame.game.sim as simulator
 
-def validate_card(card):
-	if card not in valid_cards:
-		raise ValueError("invalid card '%s'" % card)
+from pygame.game.error import Error
 
-def validate_slot(slot):
-	n = int(slot) # raises for non-numbers
-	if n not in range(256):
-		raise ValueError("slot not in [0,255]")
-
-def dump_left_app(card, slot):
-	validate_card(card)
-	validate_slot(slot)
-	print "1"
-	print card
-	print slot
-
-def dump_right_app(card, slot):
-	validate_card(card)
-	validate_slot(slot)
-	print "2"
-	print slot
-	print card
-
-def opp():
-	card, slot = None, None
-	validate = False # don't incur runtime penalty by default
-	try:
-		lr = raw_input()
-		sys.stderr.write("lr=%r\n" %lr)
-		lr = eval(lr)
-		if lr == 1:
-			card = raw_input()
-			if validate:
-				validate_card(card)
-			sys.stderr.write("card=%r\n" %card)
-			slot = raw_input()
-			if validate:
-				validate_slot(slot)
-			sys.stderr.write("slot=%r\n" %slot)
-		else:
-			slot = raw_input()
-			if validate:
-				validate_slot(slot)
-			sys.stderr.write("Slot=%r\n" %slot)
-			card = raw_input()
-			if validate:
-				validate_card(card)
-			sys.stderr.write("Card=%r\n" %card)
-	except EOFError as e:
-		pass
-	return card, slot
+# note: this invokes a simulator entirely through
+# commands from memory, it does not perform I/O
 
 if __name__ == "__main__":
-	card, slot = None, None
-	if sys.argv[1] == '1':
-		card, slot = opp()
-	while card is not None:
-		dump_left_app("I", 0)
-		sys.stdout.flush()
-		card, slot = opp()
+	me = 0
+	if len(sys.argv) > 1 and sys.argv[1] == '1':
+		me = 1
+	#stream = None
+	stream = sys.stderr
+	sim = simulator.Simulator(me, log_stream=stream)
+	while 1:
+		my_cards = cards.a_cards[sim.player]
+		try:
+			if sim.player == me:
+				# player is active
+				# TBD (test smart algorithms here)
+				sim.apply_left(my_cards["dec"], int(random.random() * 256)) # left: apply card (dec) to slot (random)
+			else:
+				# opponent is active
+				# TBD (for now, do predictable moves)
+				sim.apply_left(cards.I, 0) # left: apply card (I) to slot (0)
+				#sim.apply_right(cards.I, 0) # right: call whatever field card with card argument (I)
+		except Error as e:
+			# turn ends on error
+			pass
+		sim.next_turn()
+		if sim.turn_count > 100000:
+			break

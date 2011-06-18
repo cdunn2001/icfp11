@@ -4,8 +4,8 @@
 s is the global state.
 """
 
-class Error(Exception):
-	"Base for our exceptions."
+from error import Error
+
 def RequireInt(n):
 	if not isinstance(n, Int):
 		raise Error
