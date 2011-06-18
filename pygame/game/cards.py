@@ -142,8 +142,8 @@ def previve(pro):
 
 def pzombie(pro):
 	opp = 1-pro
-	def zombie(s, i):
-		def zombiei(x):
+	def zombie(_, i):
+		def zombiei(s, x):
 			RequireSlot(i)
 			if Alive(s.v[opp], 255-i):
 				raise Error
