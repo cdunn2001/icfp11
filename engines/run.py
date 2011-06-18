@@ -3,11 +3,10 @@ import sys
 import os.path
 import random
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-import pygame.game.cards as cards
-import pygame.game.sim as simulator
+import game.cards as cards
+import game.sim as simulator
 
-from pygame.game.error import Error
+from game.error import Error
 
 # note: this invokes a simulator entirely through
 # commands from memory, it does not perform I/O
@@ -34,6 +33,7 @@ if __name__ == "__main__":
 		except Error as e:
 			# turn ends on error
 			pass
-		sim.next_turn()
+
+		sim.next_ply()
 		if sim.turn_count > 100000:
 			break

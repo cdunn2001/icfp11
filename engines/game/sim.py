@@ -4,22 +4,24 @@
 simulator; provides access to game data and tracks movements
 """
 
-from error import Error
-import cards
+from .error import Error
+from .cards import a_cards
+from . import cards
+
 import sys
 
 class _TooManyFuncs(Exception):
 	# flags the "more than 1000 functions" case of auto-app
 	pass
 
-class Simulator:
+class Simulator(object):
 	"""Manages state for both players of the game, and also
 	provides behavior for switching turns.
 	
 	A new Simulator initializes vitalities to 10000 and
 	fields to the Identity function, as in the spec.
 	
-	To run a simulator, call next_turn() repeatedly.  This
+	To run a simulator, call next_ply() repeatedly.  This
 	automatically manages auto-application mode, and the
 	"player" and "opponent" data members reflect indices
 	into the "v" and "f" data structures.
@@ -105,7 +107,7 @@ class Simulator:
 		
 		This must be called ANY time a function from a card is applied
 		ANYWHERE.  If is_auto_app mode is True, the count will reset
-		for every slot; otherwise, it is reset by next_turn().
+		for every slot; otherwise, it is reset by next_ply().
 		"""
 		self.appl_count = self.appl_count + 1
 		if (self.appl_count > 1000): # as in spec (either regular turns or auto-apps)
@@ -145,7 +147,7 @@ class Simulator:
 		self.applying_slot()
 		self.f[ai][slot] = self.f[ai][slot](self, card) # may raise and abort assignment (OK, in spec)
 
-	def next_turn(self):
+	def next_ply(self):
 		"""Implicitly changes the current player and current opponent,
 		and applies auto-application to all of the new player's data.
 		After this returns, you may start instructing the simulator on
@@ -158,6 +160,21 @@ class Simulator:
 		self.appl_count = 0
 		if self.log_stream is not None:
 			print >>self.log_stream, "new turn:", self.turn_count
+
+	def move(self, lr, card_name, slot):
+		"""
+		False => card(slot)
+		True  => slot(card)
+		"""
+		sim = self
+		#print lr, card_name, slot
+		card = a_cards[sim.player][card_name]
+		if not lr:
+			sim.apply_left(card, slot)
+		else:
+			sim.apply_right(card, slot)
+		sim.next_ply()
+
 
 if __name__ == "__main__":
 	# basic test...see what's defined
