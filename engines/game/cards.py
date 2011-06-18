@@ -7,7 +7,7 @@ s is the global state.
 from error import Error
 
 def RequireInt(n):
-	if not isinstance(n, Int):
+	if not isinstance(n, int):
 		raise Error
 def RequireSlot(i):
 	if i<0 or i>255:

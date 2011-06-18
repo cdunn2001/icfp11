@@ -141,7 +141,7 @@ class Simulator(object):
 		elif slot not in Simulator.slot_range:
 			raise Error("slot for apply_right() is out of range")
 		elif not hasattr(self.f[ai][slot], '__call__'):
-			raise Error("slot for apply_right() is not a function")
+			pass #raise Error("slot for apply_right() is not a function")
 		if self.log_stream is not None:
 			print >>self.log_stream, "apply_right", card, slot
 		self.applying_slot()
@@ -161,19 +161,23 @@ class Simulator(object):
 		if self.log_stream is not None:
 			print >>self.log_stream, "new turn:", self.turn_count
 
-	def move(self, lr, card_name, slot):
+	def move(self, lr, func, arg):
 		"""
-		False => card(slot)
-		True  => slot(card)
+		If lr==1: func is a card-name, arg is a slot-num.
+		If lr==2: func is a slot-num, arg is a card-name.
 		"""
-		sim = self
-		#print lr, card_name, slot
-		card = a_cards[sim.player][card_name]
-		if not lr:
-			sim.apply_left(card, slot)
-		else:
-			sim.apply_right(card, slot)
-		sim.next_ply()
+		try:
+			if lr == 1:
+				card = a_cards[self.player][func]
+				slot = int(arg)
+				self.apply_left(card, slot)
+			else:
+				card = a_cards[self.player][arg]
+				slot = int(func)
+				self.apply_right(card, slot)
+		except (Error, TypeError) as e:
+			pass
+		self.next_ply()
 
 
 if __name__ == "__main__":

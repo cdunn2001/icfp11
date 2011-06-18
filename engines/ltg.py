@@ -1,24 +1,27 @@
 #!/usr/bin/env python
 
 from game.sim import Simulator
+from game.evaluator import evaluate
 from subprocess import Popen, PIPE
 import sys, os
 
 def turn(sim, p0, p1, n):
     lr0 = p0.stdout.readline()
-    card0 = p0.stdout.readline()
-    slot0 = p0.stdout.readline()
-    sim.move(int(lr0), card0[:-1], int(slot0))
-    p1.stdin.write(lr0+card0+slot0)
+    func0 = p0.stdout.readline()
+    arg0 = p0.stdout.readline()
+    #print "%r-%r-%r" %(lr0, func0, arg0)
+    sim.move(int(lr0), func0[:-1], arg0[:-1])
+    p1.stdin.write(lr0+func0+arg0)
     p1.stdin.flush() # Does this matter?
     lr1 = p1.stdout.readline()
-    card1 = p1.stdout.readline()
-    slot1 = p1.stdout.readline()
-    sim.move(int(lr1), card1[:-1], int(slot1))
-    p0.stdin.write(lr1+card1+slot1)
+    func1 = p1.stdout.readline()
+    arg1 = p1.stdout.readline()
+    #print "%r-%r-%r" %(lr1, func1, arg1)
+    sim.move(int(lr1), func1[:-1], arg1[:-1])
+    p0.stdin.write(lr1+func1+arg1)
     p0.stdin.flush() # Does this matter?
-    if not n%200:
-        print n, ": ", lr0, card0, slot0, " <-> ", lr1, card1, slot1
+    if not n%1000:
+        print n, ": ", lr0, func0, arg0, " <-> ", lr1, func1, arg1, " =>", evaluate(sim, 0)
 
 def match(e0, e1):
     p0 = Popen([e0, '0'], stdin=PIPE, stdout=PIPE)

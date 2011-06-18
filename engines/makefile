@@ -1,4 +1,8 @@
-LTG ?= ../ltg
+LTG ?= ../ltg -print-fields false #-silent true
+
+# The following does not seem to work:
+#-print-fields false
+
 
 run-py:
 	${LTG} match ./run.sh ./run.py
@@ -11,5 +15,7 @@ simple-sh:
 dec-py:
 	${LTG} match ./run.sh decspread.py 2>| dec-py
 t:
-	./ltg.py match ./run.sh ./run.sh
-
+	-./ltg.py match ./run.sh ./decspread.py 2>&1 >| t
+q:
+	${LTG} match ./run.sh ./decspread.py
+.PHONY: t q

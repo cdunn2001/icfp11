@@ -11,10 +11,10 @@ def opp():
         sys.stderr.write("No more input. Quitting\n")
         sys.exit(0)
 
-def move(rl, card, slot):
+def move(rl, func, arg):
     print rl
-    print card
-    print slot
+    print func
+    print arg
     opp()
 
 def main():
