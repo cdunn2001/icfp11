@@ -24,7 +24,7 @@ zero = 0
 def succ(_, n):
 	RequireInt(n)
 	if n < 65535:
-		return n
+		return n+1
 	else:
 		return 65535
 
@@ -49,8 +49,12 @@ def pinc(pro):
 	def inc(s, i):
 		RequireSlot(i)
 		v = s.v[pro][i]
-		if v < 65535 and v > 0:
-			s.v[pro][i] += 1
+		if s.is_auto_app:
+			if v > 0:
+				s.v[pro][i] -= 1
+		else:
+			if v < 65535 and v > 0:
+				s.v[pro][i] += 1
 		return I
 	return inc
 
@@ -58,8 +62,12 @@ def pdec(pro):
 	def dec(s, i):
 		RequireSlot(i)
 		v = s.v[pro][i]
-		if v > 0:
-			s.v[pro][i] -= 1
+		if s.is_auto_app:
+			if v < 65535 and v > 0:
+				s.v[pro][i] += 1
+		else:
+			if v > 0:
+				s.v[pro][i] -= 1
 		return I
 	return dec
 
@@ -78,8 +86,13 @@ def pattack(pro):
 				RequireSlot(j)
 				if Alive(s.v[opp], 255-j):
 					w = s.v[opp][255-j]
-					w -= n*9//10
-					if w < 0: w = 0
+					if s.is_auto_app:
+						if w > 0:
+							w += n*9//10
+							if w >65535: w = 65535
+					else:
+						w -= n*9//10
+						if w < 0: w = 0
 					s.v[opp][255-j] = w
 				return I
 			return attackij
@@ -99,8 +112,13 @@ def phelp(pro):
 				RequireSlot(j)
 				if Alive(s.v[pro], j):
 					w = s.v[pro][j]
-					w += n*11//10
-					if w > 65535: w = 65535
+					if s.is_auto_app:
+						if w > 0:
+							w -= n*11//10
+							if w < 0: w = 0
+					else:
+						w += n*11//10
+						if w > 65535: w = 65535
 					s.v[pro][j] = w
 				return I
 			return helpij
