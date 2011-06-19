@@ -3,7 +3,7 @@ LTG ?= time ../ltg #-print-fields true #-silent true
 
 # The following does not seem to work:
 #-print-fields false
-SHELL=/bin/bash
+SHELL=bash
 
 run-py:
 	${LTG} match ./run.sh ./run.py
