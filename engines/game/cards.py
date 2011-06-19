@@ -14,8 +14,10 @@ def RequireSlot(i):
 		raise Error
 def RequireLiveSlot(v, i):
 	RequireSlot(i)
-	if v[i] in (0,1):
+	if not Alive(v, i):
 		raise Error
+def Alive(v, i):
+	return v[i] not in (0,1)
 
 I = lambda _, x: x
 
@@ -147,7 +149,7 @@ def pzombie(pro):
 		def zombiei(s, x):
 			RequireSlot(i)
 			if Alive(s.v[opp], 255-i):
-				raise Error
+				raise Error("Cannot apply zombiei to live slot %i." %(255-i))
 			f1[255-i] = x
 			s.v[opp][255-i] = -1
 			return I

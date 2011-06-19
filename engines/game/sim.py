@@ -8,7 +8,7 @@ from .error import Error
 from .cards import a_cards
 from . import cards
 
-import sys
+import sys, traceback
 
 class _TooManyFuncs(Exception):
 	# flags the "more than 1000 functions" case of auto-app
@@ -120,16 +120,17 @@ class Simulator(object):
 		"""
 		ai = self.player # actor index
 		try:
-			if (self.v[ai][slot] == -1):
-				raise Error("slot for apply_left() is dead")
+			if (self.v[ai][slot] in (0, -1)):
+				raise Error("slot %i for apply_left() is dead" %slot)
 			elif slot not in Simulator.slot_range:
-				raise Error("slot for apply_left() is out of range")
+				raise Error("slot %i for apply_left() is out of range" %slot)
 			elif not hasattr(card, '__call__'):
-				raise Error("card for apply_left() is not a function")
+				raise Error("card %r for apply_left() is not a function" %card)
 			if self.log_stream is not None:
 				print >>self.log_stream, "apply_left", card, slot
 			self.applying_slot()
-			self.f[ai][slot] = card(self, self.f[ai][slot]) # may raise and abort assignment (OK, in spec)
+			fs = self.f[ai]
+			fs[slot] = card(self, fs[slot]) # may raise and abort assignment (OK, in spec)
 		except (Error, TypeError) as e:
 			self.f[ai][slot] = cards.I
 
@@ -140,17 +141,22 @@ class Simulator(object):
 		"""
 		ai = self.player # actor index
 		try:
-			if (self.v[ai][slot] == -1):
-				raise Error("slot for apply_right() is dead")
+			if (self.v[ai][slot] in (0, -1)):
+				raise Error("slot %i for apply_right() is dead" %slot)
 			elif slot not in Simulator.slot_range:
-				raise Error("slot for apply_right() is out of range")
+				raise Error("slot %i for apply_right() is out of range" %slot)
 			elif not hasattr(self.f[ai][slot], '__call__'):
-				pass #raise Error("slot for apply_right() is not a function")
+				raise Error("slot %i for apply_right() is not a function" %slot)
 			if self.log_stream is not None:
 				print >>self.log_stream, "apply_right", card, slot
 			self.applying_slot()
-			self.f[ai][slot] = self.f[ai][slot](self, card) # may raise and abort assignment (OK, in spec)
+			fs = self.f[ai]
+			if isinstance(fs[slot], int):
+				pass #raise Error("
+			fs[slot] = fs[slot](self, card) # may raise and abort assignment (OK, in spec)
 		except (Error, TypeError) as e:
+			print "error, slot:", e, slot
+			print traceback.format_exc()
 			self.f[ai][slot] = cards.I
 
 	def next_ply(self):

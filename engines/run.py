@@ -31,15 +31,16 @@ if __name__ == "__main__":
 			if sim.player == me:
 				# player is active
 				# TBD (test smart algorithms here)
-				sim.apply_left(my_cards["dec"], int(random.random() * 256)) # left: apply card (dec) to slot (random)
+				slot = int(random.random() * 256
+				sim.apply_left(my_cards["dec"], slot)) # left: apply card (dec) to slot (random)
 			else:
 				# opponent is active
 				# TBD (for now, do predictable moves)
-				sim.apply_left(cards.I, 0) # left: apply card (I) to slot (0)
-				#sim.apply_right(cards.I, 0) # right: call whatever field card with card argument (I)
+				slot = 0
+				sim.apply_left(cards.I, slot) # left: apply card (I) to slot (0)
+				#sim.apply_right(cards.I, slot) # right: call whatever field card with card argument (I)
 		except Error as e:
-			# turn ends on error
-			pass
+			sim.f[sim.player][slot] = cards.I
 
 		sim.next_ply()
 		if sim.turn_count > 100000:

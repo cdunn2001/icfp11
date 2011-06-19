@@ -1,4 +1,4 @@
-LTG ?= ../ltg -print-fields false #-silent true
+LTG ?= ../ltg -print-fields true #-silent true
 
 # The following does not seem to work:
 #-print-fields false
@@ -18,4 +18,9 @@ t:
 	-./ltg.py match ./run.sh ./decspread.py 2>&1 >| t
 q:
 	${LTG} match ./run.sh ./decspread.py
-.PHONY: t q
+zz:
+	./ltg.py match ./run.sh ./zombify.py
+z:
+	${LTG} match ./run.sh ./zombify.py
+
+.PHONY: t q z
