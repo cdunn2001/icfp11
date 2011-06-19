@@ -32,7 +32,7 @@ def as_tuples(name, *args):
             r = "(%s, %s)" %(r, arg)
     return r
 
-def repr(name, *args):
+def Repr(name, *args):
     return as_tuples(name, *args)
 
 class I:
@@ -53,7 +53,7 @@ class put:
     def __call__(self, x): return I()
 class S:
     def __init__(self): self.f = self.g = None
-    def __repr__(self): return repr("S", self.f, self.g)
+    def __repr__(self): return Repr("S", self.f, self.g)
     def __call__(self, x):
         if self.f is None:
             self.f = x
@@ -64,7 +64,7 @@ class S:
         return self.f(x)(self.g(deepcopy(x)))
 class K:
     def __init__(self): self.x = None
-    def __repr__(self): return repr("K", self.x)
+    def __repr__(self): return Repr("K", self.x)
     def __call__(self, y):
         if self.x is None:
             self.x = y
@@ -83,7 +83,7 @@ class dec:
         return I()
 class attack:
     def __init__(self): self.i = self.j = None
-    def __repr__(self): return repr("attack", self.i, self.j)
+    def __repr__(self): return Repr("attack", self.i, self.j)
     def __call__(self, n):
         if self.i is None:
             self.i = n
@@ -96,7 +96,7 @@ class attack:
         return I()
 class help:
     def __init__(self): self.i = self.j = None
-    def __repr__(self): return repr("help", self.i, self.j)
+    def __repr__(self): return Repr("help", self.i, self.j)
     def __call__(self, n):
         if self.i is None:
             self.i = n
@@ -117,7 +117,7 @@ class revive:
         return I()
 class zombie:
     def __init__(self): self.i = None
-    def __repr__(self): return repr("zombie", self.i)
+    def __repr__(self): return Repr("zombie", self.i)
     def __call__(self, x):
         if self.i is None:
             self.i = x
