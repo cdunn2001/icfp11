@@ -2,8 +2,9 @@
 import sys
 from game.compose import *
 
-print "s2g(4, (((attack, 1), zero), zero))"
-s2g(4, (((attack, 1), zero), zero))
+cmd = "s2g(4, (((attack, 1), (get, 0)), zero))"
+print cmd
+eval(cmd)
 
 #while True:
 #    print "2"

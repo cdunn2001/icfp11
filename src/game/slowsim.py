@@ -139,6 +139,8 @@ def test():
 
     >>> S()(I())(I())
 
+    >>> S()(K())(K())(S())
+
     >>> attack()(zero())(succ()(succ()(zero())))
 
     >>> S()(K()(S()(K()(S()(K()(dec()))))(K())))(get())
@@ -147,8 +149,15 @@ def test():
 
     >>> opp.slots[0].vitality
 
+    >>> pro.slots[0].field = 65535
     >>> pro.slots[1].field = 0
     >>> S()(K()(dec()))(S()(K()(get()))(K()(1)))(I())
+
+    >>> opp.slots[0].vitality
+
+    >>> S()(K()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1)))))(K()(65535))
+
+    >>> S()(K()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1)))))(K()(65535))(I())
 
     >>> opp.slots[0].vitality
     """
