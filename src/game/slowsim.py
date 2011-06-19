@@ -18,7 +18,7 @@ def vital(slot, delta):
     if old <= 0 and slot.vitality > 0:
         slot.parent.aliveCount += 1
 
-tuples = 1
+tuples = [1]
 
 def as_calls(name, *args):
     r = name
@@ -35,7 +35,7 @@ def as_tuples(name, *args):
     return r
 
 def Repr(name, *args):
-    return as_tuples(name, *args) if tuples else as_calls(name, *args)
+    return as_tuples(name, *args) if tuples[0] else as_calls(name, *args)
 
 class I:
     def __repr__(self): return "I"
@@ -182,7 +182,8 @@ def test():
 
     >>> S()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1))))(K()(65535))
 
-    >>> tuples = 0
+    >>> tuples[0] = 0
+
     >>> S()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1))))(K()(65535))
 
     >>> S()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1))))(K()(65535))(I())
