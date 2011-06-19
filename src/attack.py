@@ -35,20 +35,20 @@ def main():
         turns(t2s(129, (((attack, i*2), j), (get, 0))))
         turns(t2s(129, (((attack, i*2+1), j), (get, 1))))
 
-#    turn(0, I)
-#    turn(1, I)
-#    turns(n2s(0, 8799))
-#    turns(n2s(1, 5000))
-#
-#    for i in range(129, 192):
-#        j = 255 - i
-#        turns(t2s(129, (((attack, i*4+1), j), (get, 0))))
-#        turns(t2s(129, (((attack, i*4+3), j), (get, 1))))
+    turn(put, 0)
+    turn(put, 1)
+    turns(n2s(0, 8799))
+    turns(n2s(1, 8799))
 
-    for j in range(30):
-        for i in range(128):
-            turns(t2s(129, (((help, i*2+1), i*2), (get, 2))))
-            turns(t2s(129, (((help, i*2), i*2+1), (get, 2))))
+    for i in range(64):
+        j = 128 - i
+        turns(t2s(129, (((attack, i*4+1), j), (get, 0))))
+        turns(t2s(129, (((attack, i*4+3), j), (get, 1))))
+
+    #for j in range(30):
+    #    for i in range(128):
+    #        turns(t2s(129, (((help, i*2+1), i*2), (get, 2))))
+    #        turns(t2s(129, (((help, i*2), i*2+1), (get, 2))))
     while True:
         turn(I, 0)
 
