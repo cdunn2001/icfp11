@@ -20,7 +20,7 @@ def turn(sim, p0, p1, n):
     sim.move(int(lr1), func1[:-1], arg1[:-1])
     p0.stdin.write(lr1+func1+arg1)
     p0.stdin.flush() # Does this matter?
-    if not n%1:
+    if not n%1000:
         print n, ": ", lr0, func0, arg0, " <-> ", lr1, func1, arg1, " =>", evaluate(sim, 0)
 
 def match(e0, e1):

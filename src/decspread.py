@@ -27,6 +27,7 @@ def main():
             move(1, "get", 1)
             move(1, "dec", 1)
             move(1, "succ", 0)
-        move(2, 0, "zero")
+        move(1, "put", 0) # Assign I directly to slot 0.
+        #move(2, 0, "zero") # Alt, assign I, by way of error.
 
 main()
