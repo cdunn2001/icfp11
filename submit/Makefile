@@ -10,7 +10,7 @@ TARFILE := cd-lb-kg.tar.gz
 # path to root, relative to the temporary tarball root
 RELTOPDIR := ../
 
-IMPORTANT_SRCS := $(shell cd $(RELTOPDIR) && git ls-files | egrep '(engines|pygame)')
+IMPORTANT_SRCS := $(shell cd $(RELTOPDIR) && git ls-files | egrep '(engines)')
 
 $(TARFILE):
 	@# everything must be in this directory prior to creating
@@ -24,10 +24,8 @@ $(TARFILE):
 	$(foreach RELPATH,$(IMPORTANT_SRCS),tar cf - -C $(RELTOPDIR) $(RELPATH) | tar xpf - -C $(TARDIR)/src/ ; )
 	mkdir $(TARDIR)/src/submit/
 	cp $(RELTOPDIR)/submit/Makefile $(TARDIR)/src/submit/
-	#cp $(RELTOPDIR)/install $(TARDIR) # FIXME: update this when actual executable is done
-	touch $(TARDIR)/install
-	#cp $(RELTOPDIR)/run     $(TARDIR) # FIXME: update this when actual executable is done
-	touch $(TARDIR)/run
+	echo "#!/bin/sh" > $(TARDIR)/install # for now, an empty script
+	cp $(RELTOPDIR)/engines/run.py $(TARDIR)/run # IMPORTANT: it must have the name "run" (no extensions like .py)
 	cp $(RELTOPDIR)/submit/README $(TARDIR)
 	chmod +x $(TARDIR)/{install,run}
 	@echo

@@ -5,6 +5,11 @@ import sys
 import os.path
 import random
 
+# when installed for the final submission, the "run"
+# script MUST be top-level and source files will be
+# in "src", so set up the search path accordingly
+sys.path.insert(0, "./src/engines")
+
 import game.cards as cards
 import game.sim as simulator
 
