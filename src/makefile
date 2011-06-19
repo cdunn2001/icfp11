@@ -29,6 +29,6 @@ z:
 s:
 	./ltg.py match ./run.sh ./s.py | less
 compose:
-	(./compose.py; (./compose.py | ../ltg only) |& head -10000 | perl -ne 'print if /\d=|Error/') | less
+	(./compose.py; (./compose.py | ../ltg only) 2>&1 | head -10000 | perl -ne 'print if /\d=|Error/') | less
 
 .PHONY: t q z
