@@ -39,7 +39,7 @@ def main():
     turn(put, 0)
     turn(put, 1)
     turns(n2s(0, 8799))
-    turns(n2s(1, 8799))
+    turns(n2s(1, 4000))
 
     for i in range(64):
         j = 128 - i
