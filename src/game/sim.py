@@ -187,24 +187,25 @@ class Simulator(object):
 		try:
 			ai = self.player
 			if lr == 1:
-				card = a_cards[self.player][func]
+				card = a_cards[ai][func]
 				slot = int(arg)
-				if (not isinstance(self.tr[ai][slot], tuple)):
-					self.tr[ai][slot] = (func,'I')
-				else:
-					self.tr[ai][slot] = (func,self.tr[ai][slot])
-				print "tree of player", ai, "slot", slot, "is now:", self.tr[ai][slot]
-				#print "applying left", func
+				tree_mod = False
+				if func != 'I': # reduce 'I' immediately
+					self.tr[ai][slot] = (func, self.tr[ai][slot])
+					tree_mod = True
+				if tree_mod:
+					print "tree of player", ai, "slot", slot, "is now:", self.tr[ai][slot]
 				self.apply_left(card, slot)
 			else:
-				card = a_cards[self.player][arg]
+				card = a_cards[ai][arg]
 				slot = int(func)
-				if (not isinstance(self.tr[ai][slot], tuple)):
-					self.tr[ai][slot] = ('I',arg)
+				tree_mod = True
+				if self.tr[ai][slot] == 'I': # reduce 'I' immediately
+					self.tr[ai][slot] = arg
 				else:
-					self.tr[ai][slot] = (self.tr[ai][slot],arg)
-				print "tree of player", ai, "slot", slot, "is now:", self.tr[ai][slot]
-				#print "applying right", arg
+					self.tr[ai][slot] = (self.tr[ai][slot], arg)
+				if tree_mod:
+					print "tree of player", ai, "slot", slot, "is now:", self.tr[ai][slot]
 				self.apply_right(card, slot)
 		except:
 			# We moved the exception-handler into apply_left/right.
