@@ -28,5 +28,8 @@ z:
 	${LTG} match ./run.sh ./zombify.py
 s:
 	./ltg.py match ./run.sh ./s.py | less
+compose:
+	./compose.py
+	(./compose.py | ../ltg only) |& head -1000 | perl -ne 'print if /\d=|Error/' | less
 
 .PHONY: t q z
