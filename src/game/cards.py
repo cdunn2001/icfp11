@@ -44,7 +44,7 @@ def pget(pro):
 	return get
 
 put = lambda _, x: I
-S = lambda _, f: lambda __, g: lambda s, x: f(s, x)(g(s, x))
+S = lambda _, f: lambda __, g: lambda s, x: f(s, x)(s, g(s, x))
 K = lambda _, x: lambda __, y: x
 
 def pinc(pro):

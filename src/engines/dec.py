@@ -1,6 +1,6 @@
 import sys
 
-def dec():
+def engine():
     tup = (yield)
     print>>sys.stderr, "First opp move:", tup
     while True:

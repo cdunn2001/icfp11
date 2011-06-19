@@ -1,6 +1,6 @@
 #!/usr/bin/python
-from engines.dec import dec
-import sys
+from engines import killatron as e
+import sys, os
 
 def opp():
     try:
@@ -26,7 +26,7 @@ def move(func, arg):
 
 def main():
     #print>>sys.stderr, "argv:", sys.argv
-    engine = dec()
+    engine = e.engine()
     engine.next()
     func, arg = None, None
     if sys.argv[1] == "1":
