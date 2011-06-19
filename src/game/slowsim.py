@@ -7,6 +7,7 @@ from copy import deepcopy
 
 def vital(slot, delta):
     old = slot.vitality
+    #print "Changing vitality %d by %d" %(old, delta)
     slot.vitality += delta
     if slot.vitality < 0:
         slot.vitality = 0
@@ -62,12 +63,13 @@ class K:
 class inc:
     def __repr__(self): return "inc"
     def __call__(self, i):
-        vital(pro.slots[i], 1)
+        vital(pro.slots[i], autosign * 1)
         return I()
 class dec:
     def __repr__(self): return "dec"
     def __call__(self, i):
-        vital(pro.slots[i], -1)
+        #print "INDEX: %d" %i
+        vital(opp.slots[i], autosign * -1)
         return I()
 class attack:
     def __init__(self): self.i = self.j = None
@@ -80,7 +82,7 @@ class attack:
             self.j = n
             return self
         vital(pro.slots[i], -n)
-        vital(opp.slots[255-j], n * 9 // 10)
+        vital(opp.slots[255-j], autosign * -n * 9 // 10)
         return I()
 class help:
     def __init__(self): self.i = self.j = None
@@ -93,7 +95,7 @@ class help:
             self.j = n
             return self
         vital(pro.slots[i], -n)
-        vital(pro.slots[j], n * 11 // 10)
+        vital(pro.slots[j], autosign * n * 11 // 10)
         return I()
 class copy:
     def __repr__(self): return "copy"
@@ -106,34 +108,49 @@ class revive:
 class zombie:
     def __init__(self): self.i = None
     def __repr__(self): return repr("zombie", self.i)
-    def __call__(self, n):
+    def __call__(self, x):
         if self.i is None:
-            self.i = n
+            self.i = x
             return self
+        i = 255 - self.i
+        opp.slots[i].field = x
         vital(opp.slots[i], -1 - opp.slots[i].vitality)
         return I()
 
 class Slot:
     def __init__(self, parent):
         self.parent = parent
-        self.field = I
-        self.vitality = 100000
+        self.field = I()
+        self.vitality = 10000
 class Player:
     def __init__(self):
         self.slots = [Slot(self) for i in range(256)]
         self.aliveCount = 256
+
 player1 = Player()
 player2 = Player()
+autosign = 1
+pro = player1
+opp = player2
 
 def test():
     """
-    >>> pro = player1
-    >>> opp = player2
     >>> S()(I())(I())(K())
 
     >>> S()(I())(I())
 
     >>> attack()(zero())(succ()(succ()(zero())))
+
+    >>> S()(K()(S()(K()(S()(K()(dec()))))(K())))(get())
+
+    >>> S()(K()(dec()))(S()(K()(get()))(K()(1)))
+
+    >>> opp.slots[0].vitality
+
+    >>> pro.slots[1].field = 0
+    >>> S()(K()(dec()))(S()(K()(get()))(K()(1)))(I())
+
+    >>> opp.slots[0].vitality
     """
 
 if __name__ == "__main__":
