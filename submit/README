@@ -1,4 +1,19 @@
-TBD - describe what is interesting about this solution
+We wrote our own simulator (game/sim.py) so that we
+could verify all the effects of our selected moves.
+Cards (game/cards.py) are implemented according to
+the spec using Python functions and nested lambdas.
+A slower tree-based simulator was also built to
+aid debugging.
+
+We have helper code to construct series of moves
+based on end goals (game/compose.py).  For example,
+to target a particular slot we must first be able
+to generate its number.
+
+The run driver chooses between multiple "engines",
+so that we can have more than one approach to
+playing the match.  The engine chooses the next
+move on each turn.
 
 Chris Dunn (cdunn2001@gmail.com)
 Lyren Brown (lyren.brown@gmail.com)
