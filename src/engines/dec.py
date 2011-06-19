@@ -1,7 +1,8 @@
 import sys
+
 def dec():
     tup = (yield)
-    #print>>sys.stderr, "Got", tup
+    print>>sys.stderr, "First opp move:", tup
     while True:
         tup = (yield 0, "zero")
         #print>>sys.stderr, tup, "was gotten1"

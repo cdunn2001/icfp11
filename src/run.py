@@ -25,12 +25,14 @@ def move(func, arg):
     sys.stdout.flush()
 
 def main():
+    #print>>sys.stderr, "argv:", sys.argv
     engine = dec()
     engine.next()
     func, arg = None, None
-    if sys.argv[0] == "1":
+    if sys.argv[1] == "1":
         func, arg = opp()
     while True:
+        #print>>sys.stderr, "Send:", func, arg
         func, arg = engine.send((func,arg))
         #print>>sys.stderr, "Move:", func, arg
         move(func, arg)
