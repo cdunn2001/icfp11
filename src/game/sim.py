@@ -14,6 +14,19 @@ class _TooManyFuncs(Exception):
 	# flags the "more than 1000 functions" case of auto-app
 	pass
 
+# tree nodes are lists when not leaves; [0] is left, [1] is right child
+def tree_set_left(node, value):
+	if isinstance(node[0], list):
+		tree_set_left(node[0], value)
+	else:
+		node[0] = value
+
+def tree_set_right(node, value):
+	if isinstance(node[1], list):
+		tree_set_right(node[1], value)
+	else:
+		node[1] = value
+
 class Simulator(object):
 	"""Manages state for both players of the game, and also
 	provides behavior for switching turns.
@@ -72,6 +85,7 @@ class Simulator(object):
 		self.appl_count = 0
 		self.v = [[10000] * 256, [10000] * 256] # 10000 is spec init. value
 		self.f = [[cards.I] * 256, [cards.I] * 256] # Identity is spec init. value
+		self.tr = [[None] * 256, [None] * 256]
 		self.log_stream = log_stream
 
 	def _auto_app(self):
@@ -130,6 +144,12 @@ class Simulator(object):
 				print >>self.log_stream, "apply_left", card, slot
 			self.applying_slot()
 			fs = self.f[ai]
+			if (self.tr[ai][slot] is None) or (not isinstance(self.tr[ai][slot], list)):
+				self.tr[ai][slot] = cards.card_names[card]
+			else:
+				tree_set_left(self.tr[ai][slot], card)
+			print "tree of slot", slot, "is now:", self.tr[ai][slot]
+			#print "applying left", cards.card_names[card]
 			fs[slot] = card(self, fs[slot]) # may raise and abort assignment (OK, in spec)
 		except (Error, TypeError) as e:
 			self.f[ai][slot] = cards.I
@@ -153,6 +173,12 @@ class Simulator(object):
 			fs = self.f[ai]
 			if isinstance(fs[slot], int):
 				pass #raise Error("
+			if (self.tr[ai][slot] is None) or (not isinstance(self.tr[ai][slot], list)):
+				self.tr[ai][slot] = cards.card_names[fs[slot]]
+			else:
+				tree_set_right(self.tr[ai][slot], fs[slot])
+			print "tree of slot", slot, "is now:", self.tr[ai][slot]
+			#print "applying right", cards.card_names[fs[slot]]
 			fs[slot] = fs[slot](self, card) # may raise and abort assignment (OK, in spec)
 		except (Error, TypeError) as e:
 			print "error, slot:", e, slot
