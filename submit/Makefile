@@ -10,7 +10,7 @@ TARFILE := cd-lb-kg.tar.gz
 # path to root, relative to the temporary tarball root
 RELTOPDIR := ../
 
-IMPORTANT_SRCS := $(shell cd $(RELTOPDIR) && git ls-files | egrep '(src)')
+IMPORTANT_SRCS := $(shell cd $(RELTOPDIR) && git ls-files | egrep '^src')
 
 $(TARFILE):
 	@# everything must be in this directory prior to creating
@@ -18,10 +18,9 @@ $(TARFILE):
 	@# but NONE of the files or directories here should be the
 	@# originals...they should all be copied from somewhere else
 	mkdir $(TARDIR)
-	mkdir $(TARDIR)/src
 	@echo
 	@echo "-> copying source files to temporary space..."
-	$(foreach RELPATH,$(IMPORTANT_SRCS),tar cf - -C $(RELTOPDIR) $(RELPATH) | tar xpf - -C $(TARDIR)/src/ ; )
+	$(foreach RELPATH,$(IMPORTANT_SRCS),tar cf - -C $(RELTOPDIR) $(RELPATH) | tar xpf - -C $(TARDIR) ; )
 	mkdir $(TARDIR)/src/submit/
 	cp $(RELTOPDIR)/submit/Makefile $(TARDIR)/src/submit/
 	echo "#!/bin/sh" > $(TARDIR)/install # for now, an empty script
