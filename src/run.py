@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from engines.dec import dec
 import sys
 
 def opp():
@@ -24,14 +25,15 @@ def move(func, arg):
     sys.stdout.flush()
 
 def main():
-    engine = Engine(sys.argv[0])
+    engine = dec()
+    engine.next()
+    func, arg = None, None
     if sys.argv[0] == "1":
         func, arg = opp()
-        engine.notify(func, arg)
     while True:
-        func, arg = engine.next()
+        func, arg = engine.send((func,arg))
+        #print>>sys.stderr, "Move:", func, arg
         move(func, arg)
         func, arg = opp()
-        engine.notify(func, arg)
 
 main()
