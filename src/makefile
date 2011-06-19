@@ -1,19 +1,23 @@
-LTG ?= ../ltg -print-fields true #-silent true
+LTG ?= time ../ltg #-print-fields true #-silent true
+
 
 # The following does not seem to work:
 #-print-fields false
-
+SHELL=/bin/bash
 
 run-py:
 	${LTG} match ./run.sh ./run.py
 run-sh:
 	${LTG} match ./run.sh ./run.sh
 simple-py:
-	${LTG} match ./simple.sh ./simple.py 2>| simple-py
+	${LTG} match ./simple.sh ./simple.py |& tee simple-py.log | tail
 simple-sh:
-	${LTG} match ./simple.sh ./simple.sh 2>| simple-sh
+	${LTG} match ./simple.sh ./simple.sh |& tee simple-sh.log | tail
 dec-py:
-	${LTG} match ./run.sh decspread.py 2>| dec-py
+decspread-py:
+killatron-py:
+%-py:
+	${LTG} match ./run.sh ./$*.py |& tee $*-py.log | tail
 t:
 	-./ltg.py match ./run.sh ./decspread.py 2>&1 >| t
 q:

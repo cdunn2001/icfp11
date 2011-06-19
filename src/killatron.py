@@ -78,16 +78,18 @@ def turns(apps):
 def main():
     if sys.argv[0] == "1":
         opp()
-    turns(n2s(0, 0))
-    turns(n2s(3, 65535))
-    turns(t2s(4, ((S, ((S, ((S, (K, attack)), (K, 1))), ((S, (K, get)), (K, 0)))), ((S, (K, get)), (K, 3)))))
-    turns(t2s(5, ((S, ((S, ((S, (K, help)), (K, 2))), (K, 1))), ((S, (K, get)), (K, 3)))))
+    #turns(n2s(0, 0))
+    #turns(n2s(3, 65535))
+    #turns(t2s(4, ((S, ((S, ((S, (K, attack)), (K, 1))), ((S, (K, get)), (K, 0)))), ((S, (K, get)), (K, 3)))))
+    #turns(t2s(5, ((S, ((S, ((S, (K, help)), (K, 2))), (K, 1))), ((S, (K, get)), (K, 3)))))
+    #turns(t2s(9, (((attack, 1), (get, 0)), (get, 3)) ))
  
     while True:
-        for i in range(256):
-            turns(n2s(6, 4))
-            turn("get", 6)
-            turn("get", 6)
-            turn(6, I)
+        turn(0, I)
+    #    for i in range(256):
+    #        turns(n2s(6, 4))
+    #        turn(get, 6)
+    #        turn(get, 6)
+    #        turn(6, I)
 
 main();
