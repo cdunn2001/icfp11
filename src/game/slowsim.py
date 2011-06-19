@@ -18,12 +18,22 @@ def vital(slot, delta):
     if old <= 0 and slot.vitality > 0:
         slot.parent.aliveCount += 1
 
-def repr(name, *args):
+def as_calls(name, *args):
     r = name
     for arg in args:
         if arg is not None:
             r += "(%s)" %arg
     return r
+
+def as_tuples(name, *args):
+    r = name
+    for arg in args:
+        if arg is not None:
+            r = "(%s, %s)" %(r, arg)
+    return r
+
+def repr(name, *args):
+    return as_tuples(name, *args)
 
 class I:
     def __repr__(self): return "I"
@@ -37,7 +47,7 @@ class dbl:
     def __call__(self, n): return n * 2 if n < 32768 else 65535
 class get:
     def __repr__(self): return "get"
-    def __call__(self, i): return pro.slots[i].field
+    def __call__(self, i): return deepcopy(pro.slots[i].field)
 class put:
     def __repr__(self): return "put"
     def __call__(self, x): return I()
@@ -69,7 +79,7 @@ class dec:
     def __repr__(self): return "dec"
     def __call__(self, i):
         #print "INDEX: %d" %i
-        vital(opp.slots[i], autosign * -1)
+        vital(opp.slots[255-i], autosign * -1)
         return I()
 class attack:
     def __init__(self): self.i = self.j = None
@@ -81,8 +91,8 @@ class attack:
         if self.j is None:
             self.j = n
             return self
-        vital(pro.slots[i], -n)
-        vital(opp.slots[255-j], autosign * -n * 9 // 10)
+        vital(pro.slots[self.i], -n)
+        vital(opp.slots[255-self.j], autosign * -n * 9 // 10)
         return I()
 class help:
     def __init__(self): self.i = self.j = None
@@ -94,12 +104,12 @@ class help:
         if self.j is None:
             self.j = n
             return self
-        vital(pro.slots[i], -n)
-        vital(pro.slots[j], autosign * n * 11 // 10)
+        vital(pro.slots[self.i], -n)
+        vital(pro.slots[self.j], autosign * n * 11 // 10)
         return I()
 class copy:
     def __repr__(self): return "copy"
-    def __call__(self, i): return opp.slots[i].field
+    def __call__(self, i): return deepcopy(opp.slots[i].field)
 class revive:
     def __repr__(self): return "revive"
     def __call__(self, i):
@@ -139,7 +149,7 @@ def test():
 
     >>> S()(I())(I())
 
-    >>> S()(K())(K())(S())
+    >>> S()(K())(K())(help())
 
     >>> attack()(zero())(succ()(succ()(zero())))
 
@@ -149,8 +159,7 @@ def test():
 
     >>> opp.slots[0].vitality
 
-    >>> pro.slots[0].field = 65535
-    >>> pro.slots[1].field = 0
+    >>> pro.slots[1].field = 255
     >>> S()(K()(dec()))(S()(K()(get()))(K()(1)))(I())
 
     >>> opp.slots[0].vitality
@@ -159,7 +168,22 @@ def test():
 
     >>> S()(K()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1)))))(K()(65535))(I())
 
+    >>> S()(K()(attack()(2)(get()(1))))(K()(65535))
+
+    >>> S()(K()(attack()(2)(get()(1))))(K()(65535))(I())
+
     >>> opp.slots[0].vitality
+
+    >>> opp.slots[1].vitality
+
+    >>> pro.slots[1].field = 254
+
+    >>> S()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1))))(K()(65535))
+
+    >>> S()(S()(K()(attack()(2)))(S()(K()(get()))(K()(1))))(K()(65535))(I())
+
+    >>> opp.slots[1].vitality
+
     """
 
 if __name__ == "__main__":
