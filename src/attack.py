@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+sys.path.append('src')
 from game.compose import *
 
 def opp():
