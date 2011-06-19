@@ -26,5 +26,7 @@ zz:
 	./ltg.py match ./run.sh ./zombify.py
 z:
 	${LTG} match ./run.sh ./zombify.py
+s:
+	./ltg.py match ./run.sh ./s.py | less
 
 .PHONY: t q z
