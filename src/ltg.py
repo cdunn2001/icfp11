@@ -5,23 +5,29 @@ from game.evaluator import evaluate
 from subprocess import Popen, PIPE
 import sys, os
 
+LTG_INTERVAL = int(os.getenv("LTG_INTERVAL", "1"))
+print LTG_INTERVAL
+
 def turn(sim, p0, p1, n):
-    lr0 = p0.stdout.readline()
-    func0 = p0.stdout.readline()
-    arg0 = p0.stdout.readline()
-    #print "%r-%r-%r" %(lr0, func0, arg0)
-    sim.move(int(lr0), func0[:-1], arg0[:-1])
-    p1.stdin.write(lr0+func0+arg0)
+    lr0 = p0.stdout.readline()[:-1]
+    func0 = p0.stdout.readline()[:-1]
+    arg0 = p0.stdout.readline()[:-1]
+    move = "%s\n%s\n%s\n" %(lr0,func0,arg0)
+    #print "move0:", repr(move)
+    sim.move(int(lr0), func0, arg0)
+    p1.stdin.write(move)
     p1.stdin.flush() # Does this matter?
-    lr1 = p1.stdout.readline()
-    func1 = p1.stdout.readline()
-    arg1 = p1.stdout.readline()
-    #print "%r-%r-%r" %(lr1, func1, arg1)
-    sim.move(int(lr1), func1[:-1], arg1[:-1])
-    p0.stdin.write(lr1+func1+arg1)
+    lr1 = p1.stdout.readline()[:-1]
+    func1 = p1.stdout.readline()[:-1]
+    arg1 = p1.stdout.readline()[:-1]
+    move = "%s\n%s\n%s\n" %(lr1,func1,arg1)
+    #print "move1:", repr(move)
+    sim.move(int(lr1), func1, arg1)
+    p0.stdin.write(move)
     p0.stdin.flush() # Does this matter?
-    if not n%1:
-        print n, ": ", lr0, func0, arg0, " <-> ", lr1, func1, arg1, " =>", evaluate(sim, 0)
+    if not n%LTG_INTERVAL:
+        print "#%05d: (%s %s %s)(%s %s %s) => %d" %(
+            n, lr0, func0, arg0, lr1, func1, arg1, evaluate(sim, 0))
 
 def match(e0, e1):
     p0 = Popen([e0, '0'], stdin=PIPE, stdout=PIPE, bufsize=1)

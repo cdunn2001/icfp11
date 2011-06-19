@@ -120,20 +120,19 @@ class Simulator(object):
 		the card cannot be invoked.
 		"""
 		ai = self.player # actor index
-		try:
-			if (self.v[ai][slot] in (0, -1)):
-				raise Error("slot %i for apply_left() is dead" %slot)
-			elif slot not in Simulator.slot_range:
-				raise Error("slot %i for apply_left() is out of range" %slot)
-			elif not hasattr(card, '__call__'):
-				raise Error("card %r for apply_left() is not a function" %card)
-			if self.log_stream is not None:
-				print >>self.log_stream, "apply_left", card, slot
-			self.applying_slot()
-			fs = self.f[ai]
-			fs[slot] = card(self, fs[slot]) # may raise and abort assignment (OK, in spec)
-		except (Error, TypeError) as e:
-			self.f[ai][slot] = cards.I
+		vs = self.v[ai]
+		fs = self.f[ai]
+		if (vs[slot] in (0, -1)):
+			raise Error("slot %i for apply_left() is dead" %slot)
+		elif slot not in Simulator.slot_range:
+			raise Error("slot %i for apply_left() is out of range" %slot)
+		elif isinstance(card, int):
+			# not hasattr(card, '__call__'):
+			raise Error("card %r for apply_left() is not a function" %card)
+		if self.log_stream is not None:
+			print >>self.log_stream, "apply_left", card, slot
+		self.applying_slot()
+		fs[slot] = card(self, fs[slot]) # may raise and abort assignment (OK, in spec)
 
 	def apply_right(self, card, slot):
 		"""Invoke the specified function (slot field), passing in the
@@ -141,24 +140,21 @@ class Simulator(object):
 		or the slot's field cannot be invoked.
 		"""
 		ai = self.player # actor index
-		try:
-			if (self.v[ai][slot] in (0, -1)):
-				raise Error("slot %i for apply_right() is dead" %slot)
-			elif slot not in Simulator.slot_range:
-				raise Error("slot %i for apply_right() is out of range" %slot)
-			elif not hasattr(self.f[ai][slot], '__call__'):
-				raise Error("slot %i for apply_right() is not a function" %slot)
-			if self.log_stream is not None:
-				print >>self.log_stream, "apply_right", card, slot
-			self.applying_slot()
-			fs = self.f[ai]
-			if isinstance(fs[slot], int):
-				pass #raise Error("
-			fs[slot] = fs[slot](self, card) # may raise and abort assignment (OK, in spec)
-		except (Error, TypeError) as e:
-			print "error, slot:", e, slot
-			print traceback.format_exc()
-			self.f[ai][slot] = cards.I
+		vs = self.v[ai]
+		fs = self.f[ai]
+		if (vs[slot] in (0, -1)):
+			raise Error("slot %i for apply_right() is dead" %slot)
+		elif slot not in Simulator.slot_range:
+			raise Error("slot %i for apply_right() is out of range" %slot)
+		elif isinstance(fs[slot], int):
+			# not hasattr(self.f[ai][slot], '__call__'):
+			raise Error("slot %i for apply_right() is not a function" %slot)
+		if self.log_stream is not None:
+			print >>self.log_stream, "apply_right", card, slot
+		self.applying_slot()
+		if isinstance(fs[slot], int):
+			pass #raise Error("
+		fs[slot] = fs[slot](self, card) # may raise and abort assignment (OK, in spec)
 
 	def next_ply(self):
 		"""Implicitly changes the current player and current opponent,
@@ -174,6 +170,24 @@ class Simulator(object):
 		if self.log_stream is not None:
 			print >>self.log_stream, "new turn:", self.turn_count
 
+	def treeify(self, ai, slot, left, right):
+		tree = self.tr[ai]
+		if right is None:
+			tree[slot] = (left, tree[slot])
+		else: # left is None
+			if right == 'zero': right = 0
+			tree[slot] = (tree[slot], right)
+		# Simplify?
+		val = self.f[ai][slot]
+		func = tree[slot][0]
+		if isinstance(val, int):
+			tree[slot] = val
+		elif func == 'I':
+			tree[slot] = tree[slot][1]
+		elif func in ('put', 'inc', 'dec', 'revive'):
+			tree[slot] = 'I'
+		print "tree of slot[%d][%03d]: %s" %(ai, slot, tree[slot])
+
 	def move(self, lr, func, arg):
 		"""
 		If lr==1: func is a card-name, arg is a slot-num.
@@ -184,35 +198,27 @@ class Simulator(object):
 		#fp = self.f[p][:]
 		#prevo = self.v[o][:]
 		#op = self.f[o][:]
+		ai = self.player
 		try:
-			ai = self.player
 			if lr == 1:
 				card = a_cards[ai][func]
 				slot = int(arg)
-				tree_mod = False
-				if func != 'I': # reduce 'I' immediately
-					self.tr[ai][slot] = (func, self.tr[ai][slot])
-					tree_mod = True
-				if tree_mod:
-					print "tree of player", ai, "slot", slot, "is now:", self.tr[ai][slot]
 				self.apply_left(card, slot)
+				self.treeify(ai, slot, func, None)
 			else:
 				card = a_cards[ai][arg]
 				slot = int(func)
-				tree_mod = True
-				if self.tr[ai][slot] == 'I': # reduce 'I' immediately
-					self.tr[ai][slot] = arg
-				else:
-					self.tr[ai][slot] = (self.tr[ai][slot], arg)
-				if tree_mod:
-					print "tree of player", ai, "slot", slot, "is now:", self.tr[ai][slot]
 				self.apply_right(card, slot)
-		except:
-			# We moved the exception-handler into apply_left/right.
-			raise
+				self.treeify(ai, slot, None, arg)
+		except (Error, TypeError) as e:
+			print "Error: %s for slot[%d][%03d]" %(e, ai, slot)
+			print traceback.format_exc()
+			self.f[ai][slot] = cards.I
+			self.tr[ai][slot] = "I"
 		#print p, ":", diff(prevp, self.v[p]), diff(fp, self.f[p])
 		#print o, ":", diff(prevo, self.v[o]), diff(op, self.f[o])
 		self.next_ply()
+
 def fov(v):
 	if v in cards.card_names:
 		return cards.card_names[v]
